@@ -16,8 +16,8 @@ class TankTest {
     @Test
     public void testInit() {
         CollisionChecker colliderManager = new CollisionChecker();
-        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3)));
-        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2)));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3), vectorPosition));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2), vectorPosition));
         Tank tank = new Tank(new GridPoint2(3, 3), colliderManager);
         assertEquals(new GridPoint2(3, 3), tank.getCoordinates());
     }
@@ -50,13 +50,13 @@ class TankTest {
     @Test
     public void testTryMoveInSingleObstacleLeft() {
         CollisionChecker colliderManager = new CollisionChecker();
-        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3)));
-        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2)));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3), vectorPosition));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2), vectorPosition));
         GridPoint2 tankCoordinates = new GridPoint2(2, 2);
         Tank tank = new Tank(tankCoordinates, colliderManager);
 
         ArrayList<Obstacle> obstacles = new ArrayList<>();
-        obstacles.add(new Obstacle(new GridPoint2(1, 1)));
+        obstacles.add(new Obstacle(new GridPoint2(1, 1), vectorPosition));
         tank.tryMove(Direction.LEFT);
 
         assertEquals(tank.getCoordinates(), tankCoordinates);
@@ -64,13 +64,13 @@ class TankTest {
     @Test
     public void testTryMoveInSingleObstacleRight() {
         CollisionChecker colliderManager = new CollisionChecker();
-        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3)));
-        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2)));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3), vectorPosition));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2), vectorPosition));
         GridPoint2 tankCoordinates = new GridPoint2(2, 2);
         Tank tank = new Tank(tankCoordinates, colliderManager);
 
         ArrayList<Obstacle> obstacles = new ArrayList<>();
-        obstacles.add(new Obstacle(new GridPoint2(3, 2)));
+        obstacles.add(new Obstacle(new GridPoint2(3, 2), vectorPosition));
         tank.tryMove(Direction.RIGHT);
 
         assertEquals(tank.getCoordinates(), tankCoordinates);
@@ -78,13 +78,13 @@ class TankTest {
     @Test
     public void testTryMoveInSingleObstacleUp() {
         CollisionChecker colliderManager = new CollisionChecker();
-        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3)));
-        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2)));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3), vectorPosition));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2), vectorPosition));
         GridPoint2 tankCoordinates = new GridPoint2(2, 2);
         Tank tank = new Tank(tankCoordinates, colliderManager);
 
         ArrayList<Obstacle> obstacles = new ArrayList<>();
-        obstacles.add(new Obstacle(new GridPoint2(2, 3)));
+        obstacles.add(new Obstacle(new GridPoint2(2, 3), vectorPosition));
         tank.tryMove(Direction.UP);
 
         assertEquals(tank.getCoordinates(), tankCoordinates);
@@ -92,14 +92,14 @@ class TankTest {
     @Test
     public void testTryMoveInSingleObstacleDown() {
         CollisionChecker colliderManager = new CollisionChecker();
-        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3)));
-        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 1)));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3), vectorPosition));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 1), vectorPosition));
         GridPoint2 tankCoordinates = new GridPoint2(2, 2);
         Tank tank = new Tank(tankCoordinates, colliderManager);
 
         ArrayList<Obstacle> obstacles = new ArrayList<>();
-        obstacles.add(new Obstacle(new GridPoint2(2, 3)));
-        obstacles.add(new Obstacle(new GridPoint2(2, 1)));
+        obstacles.add(new Obstacle(new GridPoint2(2, 3), vectorPosition));
+        obstacles.add(new Obstacle(new GridPoint2(2, 1), vectorPosition));
         tank.tryMove(Direction.DOWN);
 
         assertEquals(tank.getCoordinates(), tankCoordinates);
@@ -107,13 +107,13 @@ class TankTest {
     @Test
     public void testTryMoveWithMultipleObstacles() {
         CollisionChecker colliderManager = new CollisionChecker();
-        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3)));
-        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2)));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3), vectorPosition));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2), vectorPosition));
         GridPoint2 tankCoordinates = new GridPoint2(2, 2);
         Tank tank = new Tank(tankCoordinates, colliderManager);
 
         ArrayList<Obstacle> obstacles = new ArrayList<>();
-        obstacles.add(new Obstacle(new GridPoint2(1, 2)));
+        obstacles.add(new Obstacle(new GridPoint2(1, 2), vectorPosition));
 
         tank.tryMove(Direction.RIGHT);
         assertEquals(tankCoordinates, tank.getCoordinates());

@@ -11,7 +11,7 @@ class ObstacleTest {
     @Test
     void testCollidesWhenTargetIsSameAsCoordinates() {
         GridPoint2 coordinates = new GridPoint2(1, 2);
-        Obstacle obstacle = new Obstacle(coordinates);
+        Obstacle obstacle = new Obstacle(coordinates, vectorPosition);
         assertTrue(obstacle.collides(coordinates));
     }
 
@@ -19,13 +19,13 @@ class ObstacleTest {
     void testCollidesWhenTargetIsDifferentFromCoordinates() {
         GridPoint2 coordinates = new GridPoint2(1, 2);
         GridPoint2 differentTarget = new GridPoint2(3, 4);
-        Obstacle obstacle = new Obstacle(coordinates);
+        Obstacle obstacle = new Obstacle(coordinates, vectorPosition);
         assertFalse(obstacle.collides(differentTarget));
     }
     @Test
     public void testGetCoordinates() {
         GridPoint2 initialCoordinates = new GridPoint2(1, 2);
-        Obstacle obstacle = new Obstacle(initialCoordinates);
+        Obstacle obstacle = new Obstacle(initialCoordinates, vectorPosition);
 
         GridPoint2 result = obstacle.getCoordinates();
 

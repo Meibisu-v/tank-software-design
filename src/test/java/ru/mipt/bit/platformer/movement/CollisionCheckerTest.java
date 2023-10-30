@@ -18,8 +18,8 @@ class CollisionCheckerTest {
 
     @Test
     void colliderTankMovementTest() {
-        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3)));
-        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2)));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(2, 3), vectorPosition));
+        colliderManager.addColliding(new Obstacle(new GridPoint2(3, 2), vectorPosition));
         Tank tank = new Tank(new GridPoint2(3, 3), colliderManager);
         assertAll(
                 () -> assertFalse(tank.collides(new GridPoint2(5, 5))),
