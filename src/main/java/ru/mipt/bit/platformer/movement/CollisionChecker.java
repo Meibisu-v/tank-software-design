@@ -20,10 +20,10 @@ public class CollisionChecker {
         colliders.remove(colliding);
     }
 
-    public boolean isFree(GridPoint2 target) {
+    public Colliding isFree(GridPoint2 target) {
         for (var collider : colliders) {
-            if (collider.collides(target)) return false;
+            if (collider.collides(target)) return collider;
         }
-        return true;
+        return null;
     }
 }

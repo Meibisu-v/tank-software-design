@@ -4,39 +4,53 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.GridPoint2;
 import org.awesome.ai.AI;
 import org.awesome.ai.strategy.NotRecommendingAI;
-import ru.mipt.bit.platformer.AI.AIAdapter;
 import ru.mipt.bit.platformer.AI.RandomAI;
-import ru.mipt.bit.platformer.graphics.Graphics;
+import ru.mipt.bit.platformer.graphics.GraphicsInit;
+import ru.mipt.bit.platformer.graphics.MapGraphics;
 import ru.mipt.bit.platformer.input.KeyboardInputHandler;
 import ru.mipt.bit.platformer.level.GenerateLevelFromMap;
 import ru.mipt.bit.platformer.level.Level;
+import ru.mipt.bit.platformer.level.LevelObserver;
 import ru.mipt.bit.platformer.movement.CollisionChecker;
 import ru.mipt.bit.platformer.input.Direction;
+import ru.mipt.bit.platformer.util.TileUtils;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 public class GameDesktopLauncher implements ApplicationListener {
-    private Graphics graphics;
+    private GraphicsInit graphicsInit;
     private TiledMap map;
     private CollisionChecker collisionChecker;
     private Level level;
+    private TileUtils tileUtils;
+    private Batch batch;
+    private LevelObserver levelListener;
     private final KeyboardInputHandler inputHandler = new KeyboardInputHandler();
     @Override
     public void create() {
         map = new TmxMapLoader().load("level.tmx");
-//        level = new Level(new GenerateLevelFromCoord("src/main/resources/placement.txt"));
+        TiledMapTileLayer groundLayer = getSingleLayer(map);
+        tileUtils = new TileUtils(new GridPoint2(groundLayer.getTileWidth(), groundLayer.getTileHeight()));
         AI aiAdapter = new NotRecommendingAI();
         level = new Level(new GenerateLevelFromMap("src/main/resources/map.txt"));
-//        new RandomMapGenerator(10, 8,3 ).saveMapToFile("randomMap.txt");
-//        level = new Level(new GenerateLevelFromMap("src/main/resources/randomMap.txt"));
+
+        batch = new SpriteBatch();
+        levelListener = new LevelObserver(new MapGraphics(map, batch), batch);
+        level.subscribe(levelListener);
+
+
         collisionChecker = new CollisionChecker();
-        level.initObjects(collisionChecker);
-        graphics = new Graphics(level, map);
+        level.initObjects(collisionChecker, tileUtils);
+//        graphicsInit = new GraphicsInit(level, map, groundLayer);
         initColliders();
     }
 
@@ -55,20 +69,22 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void render() {
-        clearScreen();
-
+        // do action
         float deltaTime = Gdx.graphics.getDeltaTime();
-
-        Direction desiredDirection = inputHandler.handleKeystrokes();
-        level.getPlayableTank().tryMove(desiredDirection);
-        graphics.calculateInterpolatedCoordinates();
-        continueTankProgress(deltaTime);
         for (RandomAI actor : level.getActors()) {
             actor.setDeltaTime(deltaTime);
             actor.doAction();
         }
+
+        Direction desiredDirection = inputHandler.handleKeystrokes();
+        level.getPlayableTank().tryMove(desiredDirection);
+//        graphicsInit.calculateInterpolatedCoordinates();
+
+        continueTankProgress(deltaTime);
+        clearScreen();
+        levelListener.levelRender();
         // render each tile of the level
-        renderGame();
+//        renderGame();
     }
 
     private void continueTankProgress(float deltaTime) {
@@ -77,7 +93,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         level.getPlayableTank().tryReachDestinationCoordinates(newMovementProgress);
     }
     private void renderGame() {
-        graphics.renderGame();
+        graphicsInit.renderGame();
     }
 
     private static void clearScreen() {
@@ -102,12 +118,12 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void dispose() {
-        graphics.dispose();
+        graphicsInit.dispose();
         // dispose of all the native resources (classes which implement com.badlogic.gdx.utils.Disposable)
         //tankObjectGraphics.dispose();
         //treeObjectGraphics.dispose();
         map.dispose();
-        graphics.dispose();
+        graphicsInit.dispose();
     }
 
     public static void main(String[] args) {
