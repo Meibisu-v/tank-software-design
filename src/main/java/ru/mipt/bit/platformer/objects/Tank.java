@@ -36,6 +36,10 @@ public class Tank implements Colliding {
         return destinationCoordinates;
     }
 
+    public TankState getTankState() {
+        return tankState;
+    }
+
     public Tank(GridPoint2 initialCoordinates, CollisionChecker collisionChecker, TileUtils tileUtils,
                 TankState tankState) {
         destinationCoordinates = initialCoordinates;
@@ -102,7 +106,7 @@ public class Tank implements Colliding {
         tankState.receiveDamage(bullet);
     }
 
-    public Object getTileUtils() {
+    public TileUtils getTileUtils() {
         return tileUtils;
     }
 }

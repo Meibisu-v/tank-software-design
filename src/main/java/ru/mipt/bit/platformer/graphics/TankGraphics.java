@@ -21,6 +21,14 @@ public class TankGraphics implements Graphics{
         this.batch = batch;
     }
 
+    public Rectangle getRectangle() {
+        return rectangle;
+    }
+
+    public Tank getTank() {
+        return tank;
+    }
+
     @Override
     public void render() {
         rectangle.setCenter(tank.getPosition());

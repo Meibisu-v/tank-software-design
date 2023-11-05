@@ -13,9 +13,9 @@ import com.badlogic.gdx.math.GridPoint2;
 import org.awesome.ai.AI;
 import org.awesome.ai.strategy.NotRecommendingAI;
 import ru.mipt.bit.platformer.AI.RandomAI;
-import ru.mipt.bit.platformer.graphics.GraphicsInit;
 import ru.mipt.bit.platformer.graphics.MapGraphics;
 import ru.mipt.bit.platformer.input.KeyboardInputHandler;
+import ru.mipt.bit.platformer.input.ToggleListener;
 import ru.mipt.bit.platformer.level.GenerateLevelFromMap;
 import ru.mipt.bit.platformer.level.Level;
 import ru.mipt.bit.platformer.level.LevelObserver;
@@ -27,7 +27,6 @@ import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 public class GameDesktopLauncher implements ApplicationListener {
-    private GraphicsInit graphicsInit;
     private TiledMap map;
     private CollisionChecker collisionChecker;
     private Level level;
@@ -44,9 +43,11 @@ public class GameDesktopLauncher implements ApplicationListener {
         level = new Level(new GenerateLevelFromMap("src/main/resources/map.txt"));
 
         batch = new SpriteBatch();
-        levelListener = new LevelObserver(new MapGraphics(map, batch), batch);
-        level.subscribe(levelListener);
 
+        ToggleListener toggleListener = new ToggleListener();
+
+        levelListener = new LevelObserver(new MapGraphics(map, batch), batch, toggleListener);
+        level.subscribe(levelListener);
 
         collisionChecker = new CollisionChecker();
         level.initObjects(collisionChecker, tileUtils);
@@ -75,7 +76,7 @@ public class GameDesktopLauncher implements ApplicationListener {
             actor.setDeltaTime(deltaTime);
             actor.doAction();
         }
-
+        level.update(deltaTime);
         Direction desiredDirection = inputHandler.handleKeystrokes();
         level.getPlayableTank().tryMove(desiredDirection);
 //        graphicsInit.calculateInterpolatedCoordinates();
@@ -91,9 +92,6 @@ public class GameDesktopLauncher implements ApplicationListener {
         float newMovementProgress = continueProgress(level.getPlayableTank().getMovementProgress(),
                                                     deltaTime, level.getPlayableTank().getSpeed());
         level.getPlayableTank().tryReachDestinationCoordinates(newMovementProgress);
-    }
-    private void renderGame() {
-        graphicsInit.renderGame();
     }
 
     private static void clearScreen() {
@@ -118,12 +116,11 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void dispose() {
-        graphicsInit.dispose();
+//        graphicsInit.dispose();
         // dispose of all the native resources (classes which implement com.badlogic.gdx.utils.Disposable)
-        //tankObjectGraphics.dispose();
-        //treeObjectGraphics.dispose();
         map.dispose();
-        graphicsInit.dispose();
+        levelListener.levelRender();
+        batch.dispose();
     }
 
     public static void main(String[] args) {

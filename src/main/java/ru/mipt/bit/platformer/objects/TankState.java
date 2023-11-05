@@ -23,4 +23,12 @@ public class TankState {
             //
         }
     }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public int getCurHealth() {
+        return curHealth;
+    }
 }
