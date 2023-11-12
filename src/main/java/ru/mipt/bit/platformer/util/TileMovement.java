@@ -29,8 +29,6 @@ public class TileMovement {
         float intermediateBottomLeftX = interpolation.apply(fromTileBottomLeftX, toTileBottomLeftX, progress);
         float intermediateBottomLeftY = interpolation.apply(fromTileBottomLeftY, toTileBottomLeftY, progress);
 
-        return rectangle
-                .setX(intermediateBottomLeftX)
-                .setY(intermediateBottomLeftY);
+        return rectangle.setX(intermediateBottomLeftX).setY(intermediateBottomLeftY);
     }
 }
