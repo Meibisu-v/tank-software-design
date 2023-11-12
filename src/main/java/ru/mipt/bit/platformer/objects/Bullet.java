@@ -3,6 +3,7 @@ package ru.mipt.bit.platformer.objects;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import ru.mipt.bit.platformer.input.Direction;
+import ru.mipt.bit.platformer.input.DirectionCoordinates;
 import ru.mipt.bit.platformer.level.Level;
 import ru.mipt.bit.platformer.movement.Colliding;
 import ru.mipt.bit.platformer.movement.CollisionChecker;
@@ -18,10 +19,10 @@ public class Bullet {
     private ObjectState objectState;
     private final CollisionChecker colliderManager;
     private final TileUtils tileUtils;
-    private final Direction direction;
+    private final DirectionCoordinates direction;
     private final Level level;
 
-    public Bullet(GridPoint2 gridPosition, Direction direction, int damage, float speed, CollisionChecker colliderManager,
+    public Bullet(GridPoint2 gridPosition, DirectionCoordinates direction, int damage, float speed, CollisionChecker colliderManager,
                   TileUtils tileUtils, Level level) {
         this.damage = damage;
         this.gridPosition = gridPosition;
@@ -66,7 +67,7 @@ public class Bullet {
         if (objectState == null || objectState.finishedMoving()) {
             GridPoint2 prevPosition = gridPosition.cpy();
 
-            gridPosition = direction.apply(prevPosition);
+            gridPosition.add(direction.getDeltaCoordinate());
 
             objectState = new ObjectState(prevPosition, gridPosition, tileUtils, speed);
         }

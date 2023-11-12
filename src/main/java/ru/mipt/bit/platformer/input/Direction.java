@@ -3,30 +3,31 @@ package ru.mipt.bit.platformer.input;
 import com.badlogic.gdx.math.GridPoint2;
 
 public enum Direction {
-    UP(new GridPoint2(0,1), 90),
-    DOWN(new GridPoint2(0,-1), -90),
-    LEFT(new GridPoint2(-1,0), -180),
-    RIGHT(new GridPoint2(1,0), 0),
-    NODIRECTION(new GridPoint2(0, 0), 1);
+    UP(new DirectionCoordinates(0,1)),
+    DOWN(new DirectionCoordinates(0,-1)),
+    LEFT(new DirectionCoordinates(-1,0)),
+    RIGHT(new DirectionCoordinates(1,0)),
+    NODIRECTION(new DirectionCoordinates(0, 0));
 
 
-    private final GridPoint2 vector;
+    private final DirectionCoordinates direction;
 
-    private final float angle;
-
-    Direction(GridPoint2 vector, float angle){
-        this.vector = vector;
-        this.angle = angle;
+    Direction(DirectionCoordinates direction) {
+        this.direction = direction;
     }
 
-    public float getAngle() {
-        return angle;
+    public static DirectionCoordinates calcDirection(float angle) {
+        for (var directions : Direction.values()) {
+            if (Math.abs(angle - directions.getDirection().getAngle()) < 0.1f) {
+                return directions.getDirection();
+            }
+        }
+        return null;
     }
 
-    public GridPoint2 getVector() {
-        return vector;
+    public DirectionCoordinates getDirection() {
+        return direction;
     }
-
     public GridPoint2 apply(GridPoint2 point) {
         GridPoint2 copyPoint = point.cpy();
         switch (this) {

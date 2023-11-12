@@ -15,7 +15,7 @@ public class BulletGraphics implements Graphics{
     private final Bullet bullet;
 
     public BulletGraphics(Bullet bullet, Batch batch)  {
-        this.textureRegion = new TextureRegion(new Texture("images/bullet.png"));
+        this.textureRegion = new TextureRegion(new Texture("images/pngwing.com.png"));
         this.rectangle = new Rectangle().setWidth(textureRegion.getRegionWidth())
                 .setHeight(textureRegion.getRegionHeight());
 
@@ -23,6 +23,7 @@ public class BulletGraphics implements Graphics{
         this.bullet = bullet;
     }
     public void render() {
+        rectangle.setCenter(bullet.getPosition());
         drawTextureRegionUnscaled(batch, textureRegion, rectangle, 0f);
 
     }

@@ -13,9 +13,10 @@ import java.util.List;
 
 public class Level implements EventManager {
     private final ArrayList<Obstacle> obstacles;
-    private final ArrayList<Object> bullets;
+    private final ArrayList<Bullet> bullets;
     private final ArrayList<EventListener> observers;
-    private final ArrayList<Object> destroyedBullets;
+    private final ArrayList<Bullet> destroyedBullets;
+    private final CollisionChecker collisionChecker;
     private Tank playableTank;
     private final ArrayList<Tank> tanks;
     private final LevelGenerator generator;
@@ -28,6 +29,7 @@ public class Level implements EventManager {
         bullets = new ArrayList<>();
         observers = new ArrayList<>();
         destroyedBullets = new ArrayList<>();
+        collisionChecker = new CollisionChecker();
     }
 
     public Border getBorder() {
@@ -53,7 +55,7 @@ public class Level implements EventManager {
     public void initBorder(int width, int height) {
         border = new Border(width, height);
     }
-    public void initObjects(CollisionChecker collisionChecker, TileUtils tileUtils) {
+    public void initObjects(TileUtils tileUtils) {
         initBorder(10, 8);
         List<String> content = generator.generate();
         for (String line : content) {
@@ -62,9 +64,12 @@ public class Level implements EventManager {
             int x = Integer.parseInt(parts[1]);
             int y = Integer.parseInt(parts[2]);
 //            float speed = 0.2f;
+            float speed = 0.1f;
+            int damage = 1;
             switch (type) {
                 case "X":
-                    playableTank = new Tank(new GridPoint2(x, y), collisionChecker, tileUtils, new TankState());
+                    playableTank = new Tank(new GridPoint2(x, y), collisionChecker, tileUtils, new TankState(), new Light());
+                    playableTank.addGun(new Gun(this, playableTank, speed, damage));
                     observers.forEach(observer -> observer.update("add", playableTank));
                     break;
                 case "T":
@@ -72,7 +77,8 @@ public class Level implements EventManager {
                     observers.forEach(observer -> obstacles.forEach((obstacle -> observer.update("add", obstacle))));
                     break;
                 case "E":
-                    Tank newTank = new Tank(new GridPoint2(x, y), collisionChecker, tileUtils, new TankState(2));
+                    Tank newTank = new Tank(new GridPoint2(x, y), collisionChecker, tileUtils, new TankState(2), new Heavy());
+                    playableTank.addGun(new Gun(this, newTank, speed, damage));
                     tanks.add(newTank);
                     observers.forEach(observer -> tanks.forEach(enemy -> observer.update("add", enemy)));
                     actors.add(new RandomAI(newTank));
@@ -87,6 +93,9 @@ public class Level implements EventManager {
     }
 
     public void update(float deltaTime) {
+        for (var bullet : bullets) {
+            bullet.update(deltaTime);
+        }
         for (var tank : tanks) {
             tank.update(deltaTime);
         }
@@ -99,6 +108,32 @@ public class Level implements EventManager {
     public void removeBullet(Bullet bullet) {
         destroyedBullets.add(bullet);
         observers.forEach(observer -> observer.update("erase", bullet));
+    }
+    public void removeTank(Tank tank) {
+        observers.forEach(observer -> observer.update("erase", tank));
+        if (tank == playableTank) {
+            playableTank = null;
+        } else {
+            tanks.remove(tank);
+        }
+        collisionChecker.removeColliding(tank);
+    }
+    public void addBullet(Bullet bullet) {
+        bullets.add(bullet);
+        observers.forEach(observer -> observer.update("add", bullet));
+    }
+
+    public void initColliders() {
+        collisionChecker.addColliding(border);
+        if (playableTank != null) {
+            collisionChecker.addColliding(playableTank);
+        }
+        for (var tank : tanks) {
+            collisionChecker.addColliding(tank);
+        }
+        for (var obstacle : obstacles) {
+            collisionChecker.addColliding(obstacle);
+        }
     }
 
     @Override

@@ -11,6 +11,7 @@ public class RandomAI implements Action {
     private final Tank tank;
     float deltaTime;
 
+
     public RandomAI(Tank tank) {
         this.tank = tank;
     }
@@ -24,10 +25,11 @@ public class RandomAI implements Action {
         Direction[] directions = Direction.values();
         Random random = new Random();
         int idx = random.nextInt(directions.length);
-        tank.tryMove(directions[idx]);
+        tank.tryMove(directions[idx].getDirection());
         float newMovementProgress = continueProgress(tank.getMovementProgress(),
                 deltaTime, tank.getSpeed());
 //
         tank.tryReachDestinationCoordinates(newMovementProgress);
+
     }
 }

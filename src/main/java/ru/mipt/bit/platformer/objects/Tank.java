@@ -1,6 +1,7 @@
 package ru.mipt.bit.platformer.objects;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import ru.mipt.bit.platformer.input.DirectionCoordinates;
 import ru.mipt.bit.platformer.level.Level;
 import ru.mipt.bit.platformer.movement.Colliding;
 import ru.mipt.bit.platformer.movement.CollisionChecker;
@@ -11,6 +12,7 @@ import ru.mipt.bit.platformer.util.TileUtils;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 public class Tank implements Colliding {
+    private final TankType tankType;
     private GridPoint2 coordinates;
     private final Vector2 position;
     private GridPoint2 destinationCoordinates;
@@ -21,9 +23,11 @@ public class Tank implements Colliding {
     private float rotation;
     private float movementProgress = MOVEMENT_COMPLETED;
     private final CollisionChecker collisionChecker;
-    private final TankState tankState;
+    private TankState tankState;
     private ObjectState movement;
     private final TileUtils tileUtils;
+    private Gun gun;
+    private TankType TankType;
 
     public float getSpeed() {
         return MOVEMENT_SPEED;
@@ -41,7 +45,7 @@ public class Tank implements Colliding {
     }
 
     public Tank(GridPoint2 initialCoordinates, CollisionChecker collisionChecker, TileUtils tileUtils,
-                TankState tankState) {
+                TankState tankState, TankType tankType) {
         destinationCoordinates = initialCoordinates;
         this.position = tileUtils.calculateTileCenter(destinationCoordinates);
         coordinates = initialCoordinates;
@@ -50,27 +54,42 @@ public class Tank implements Colliding {
         this.tankState = tankState;
         this.tileUtils = tileUtils;
         this.movement = new ObjectState(coordinates, coordinates, tileUtils, MOVEMENT_SPEED);
+        this.tankType = tankType;
+        tankType.setTank(this);
     }
 
     public Vector2 getPosition() {
         return position;
     }
 
-    public void tryMove(Direction direction) {
-        if (movement.finishedMoving()) {
-            GridPoint2 newCoordinates = direction.apply(coordinates);
-            if (collisionChecker.isFree(newCoordinates) == null) {
-                position.add(direction.getVector().x, direction.getVector().y);
-                movement = new ObjectState(coordinates, newCoordinates, tileUtils, MOVEMENT_SPEED);
-                coordinates = newCoordinates;
-            }
-            rotation = direction.getAngle();
+    public void tryMove(DirectionCoordinates direction) {
+//        if (movement.finishedMoving()) {
+//            GridPoint2 newCoordinates = direction.apply(coordinates);
+//            if (collisionChecker.isFree(newCoordinates) == null) {
+//                position.add(direction.getVector().x, direction.getVector().y);
+//                movement = new ObjectState(coordinates, newCoordinates, tileUtils, MOVEMENT_SPEED);
+//                coordinates = newCoordinates;
+//            }
+//            rotation = direction.getAngle();
+//        }
+        tankType.tryMove(direction);
+    }
+
+    public void tryShoot() {
+        if (gun != null) {
+            gun.tryShoot();
         }
+    }
+    public CollisionChecker getCollisionChecker() {
+        return collisionChecker;
     }
 
     public void update(float deltaTime) {
         movement.update(deltaTime);
         position.set(movement.calculatePosition());
+//        if (gun != null) {
+////            gun.update();
+//        }
     }
     public float getMovementProgress() {
         return movementProgress;
@@ -84,6 +103,7 @@ public class Tank implements Colliding {
         return isEqual(movementProgress, MOVEMENT_COMPLETED);
     }
 
+
     public void tryReachDestinationCoordinates(float newMovementProgress) {
         movementProgress = newMovementProgress;
         if (isEqual(newMovementProgress, MOVEMENT_COMPLETED)) {
@@ -92,6 +112,7 @@ public class Tank implements Colliding {
 
         }
     }
+
 
     @Override
     public boolean collides(GridPoint2 target) {
@@ -105,8 +126,25 @@ public class Tank implements Colliding {
     public void takeDamage(Bullet bullet, Level level) {
         tankState.receiveDamage(bullet);
     }
+    public void changeState(TankType tankState) {
+        this.TankType = tankState;
+    }
 
+    public void addGun(Gun gun) {
+        this.gun = gun;
+    }
     public TileUtils getTileUtils() {
         return tileUtils;
+    }
+
+    public void tryMoveWithSpeed(DirectionCoordinates direction, float speed) {
+        if (movement.finishedMoving()) {
+            if (collisionChecker.isFree(coordinates.cpy().add(direction.getDeltaCoordinate())) == null) {
+                GridPoint2 prevGridPosition = coordinates.cpy();
+                coordinates.add(direction.getDeltaCoordinate());
+                movement = new ObjectState(prevGridPosition, coordinates, tileUtils,speed * MOVEMENT_SPEED);
+            }
+            rotation = direction.getAngle();
+        }
     }
 }

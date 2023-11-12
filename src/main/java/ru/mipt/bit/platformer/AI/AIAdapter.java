@@ -9,6 +9,7 @@ import org.awesome.ai.state.movable.Bot;
 import org.awesome.ai.state.movable.Orientation;
 import org.awesome.ai.state.movable.Player;
 import ru.mipt.bit.platformer.input.Direction;
+import ru.mipt.bit.platformer.input.DirectionCoordinates;
 import ru.mipt.bit.platformer.level.Level;
 import ru.mipt.bit.platformer.objects.Tank;
 
@@ -113,7 +114,7 @@ public class AIAdapter implements ru.mipt.bit.platformer.AI.Action {
                     direction = Direction.LEFT;
                     break;
             }
-            if (direction != null) tank.tryMove(direction);
+            if (direction != null) tank.tryMove(direction.getDirection());
         }
 
     }

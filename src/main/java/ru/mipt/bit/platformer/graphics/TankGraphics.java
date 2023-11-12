@@ -37,7 +37,7 @@ public class TankGraphics implements Graphics{
         float regionOriginX = regionWidth / 2f;
         float regionOriginY = regionHeight / 2f;
         batch.draw(textureRegion, rectangle.x, rectangle.y, regionOriginX, regionOriginY, regionWidth, regionHeight,
-                1f, 1f, 0f);
+                1f, 1f, tank.getRotation());
 
     }
 
